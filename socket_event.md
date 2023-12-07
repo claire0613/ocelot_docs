@@ -65,7 +65,7 @@ sequenceDiagram
     participant B as BackendSocket
     participant R as Redis
     A->>B: connected
-    B->>R: set "manager:user_id" key {"sid":sid,client_id": user_id,"role": role,"org_id": org_id}
+    B->>R: set "manager:org_{org_id}_user_{user_id}" key {"sid":sid,client_id": user_id,"role": role,"org_id": org_id}
     alt reconnected
         alt get_lesson_id
             B->>B:call mixpanel reconnect
