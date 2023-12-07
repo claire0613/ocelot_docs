@@ -9,7 +9,7 @@
 
   - ## TeacherAPP
 
-:::mermaid
+```mermaid
 sequenceDiagram
 
         participant A as client
@@ -34,11 +34,11 @@ sequenceDiagram
 
         end
 
-:::
+```
 
 - ## StudentWeb
 
-:::mermaid
+```mermaid
 sequenceDiagram
 
     participant A as client
@@ -54,11 +54,11 @@ sequenceDiagram
 
     end
 
-:::
+```
 
 - ## ManagerWeb
 
-:::mermaid
+```mermaid
 sequenceDiagram
 
     participant A as client
@@ -73,7 +73,7 @@ sequenceDiagram
 
     end
 
-:::
+```
 
 ---
 
@@ -87,7 +87,7 @@ sequenceDiagram
 
 - ## TeacherAPP
 
-:::mermaid
+```mermaid
 sequenceDiagram
 
     participant A as client
@@ -98,11 +98,11 @@ sequenceDiagram
     B->>R: update "alive:org_{org_id}_user_{user_id}" key {state:disconnect}
     B->>B:call mixpanel disconnect
 
-:::
+```
 
 - ## StudentWeb/ ManagerWeb
 
-:::mermaid
+```mermaid
 sequenceDiagram
 
     participant A as client
@@ -112,7 +112,7 @@ sequenceDiagram
     B->>B: leave_room(sid,lesson_id)
     B->>B:call mixpanel disconnect
 
-:::
+```
 
 - # join_lesson Event
 
@@ -126,7 +126,7 @@ sequenceDiagram
 
 - ## TeacherAPP
 
-:::mermaid
+```mermaid
 sequenceDiagram
 
     participant A as client
@@ -146,11 +146,11 @@ sequenceDiagram
     end
     B->>R: add lesson_teacher_{lesson_id}"key {{user_id}:sid} & TTL 24hrs
 
-:::
+```
 
 - ## StudentWeb
 
-:::mermaid
+```mermaid
 sequenceDiagram
 
     participant A as client
@@ -170,7 +170,7 @@ sequenceDiagram
     end
     B->>R: add lesson_student_{lesson_id}"key {{user_id}:sid}& TTL 24hrs
 
-:::
+```
 
 - # log_out Event
 
@@ -183,7 +183,7 @@ sequenceDiagram
 
 - ## TeacherAPP
 
-:::mermaid
+```mermaid
 sequenceDiagram
 
     participant A as client
@@ -193,4 +193,4 @@ sequenceDiagram
     A->>B: log_out
     B->>R:remove "alive:org_{org_id}_user_{user_id}" key
 
-:::
+```
