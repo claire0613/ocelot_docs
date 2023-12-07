@@ -176,6 +176,7 @@ sequenceDiagram
          }
 
   - ### listeners: 
+        - manager_web
         event = "logout"
 
          {
