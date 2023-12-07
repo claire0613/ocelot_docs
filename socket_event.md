@@ -65,7 +65,7 @@ sequenceDiagram
     participant B as BackendSocket
     participant R as Redis
     A->>B: connected
-    B->>R: set "manager:org_{org_id}_user_{user_id}" key {"sid":sid,client_id": user_id,"role": role,"org_id": org_id}
+    B->>R: enter_room(room_id=org_id)
     alt reconnected
         alt get_lesson_id
             B->>B:call mixpanel reconnect
@@ -78,13 +78,7 @@ sequenceDiagram
 ---
 
 - # disconnect Event
-
-  - ### queryString:
-        role=teacher/student
-        org_id={org_id}
-        product_type= manager (optional)(manager_web need)
-        auth=access_token
-
+  
 - ## TeacherAPP
 
 ```mermaid
@@ -172,13 +166,20 @@ sequenceDiagram
 
 ```
 
-- # log_out Event
+- # logout Event
 
   - ### data:
 
          {
             user_id:"",
             org_id:"",
+         }
+
+  - ### listeners: 
+        event = "logout"
+
+         {
+            user_id:""
          }
 
 - ## TeacherAPP
@@ -191,7 +192,7 @@ sequenceDiagram
     participant R as Redis
 
     A->>B: log_out
-    B->>R:remove "alive:org_{org_id}_user_{user_id}" key
-    B->>A: emit all manager web in same org
+    B->>R: remove "alive:org_{org_id}_user_{user_id}" key
+    B->>A: emit all manager web in same org  {"user_id":{user_id}}
 
 ```
