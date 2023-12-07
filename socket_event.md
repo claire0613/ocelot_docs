@@ -192,5 +192,6 @@ sequenceDiagram
 
     A->>B: log_out
     B->>R:remove "alive:org_{org_id}_user_{user_id}" key
+    B->>A: emit all manager web in same org
 
 ```
