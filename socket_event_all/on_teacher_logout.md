@@ -1,60 +1,61 @@
-- # 事件名稱: teacher_logout
+# on_teacher_logout
 
-- ## Request(client emit data):
+- #### Infra
 
-       {
-          user_id:"",
-          org_id:"",
-       }
+  - [x] Redis
+  - [ ] RDS
 
-- ## CallBackResponse:
+- #### Client
 
-      None
+  - [x] Teacher App
+  - [ ] Participant
+  - [ ] Hub
 
-- ## Relative Infrastructure
+- #### Server Event Handler
 
-  1. Redis
+  - data
 
-- ## Usecase
+    ```
+    {
+      user_id:"",
+      org_id:"",
+    }
+    ```
 
-  - ### 1. TeacherAPP logout
+  - callback
+    ```
+    None
+    ```
 
-    - #### Clients:
+- #### Client Event Handler
 
-      1. TeacherAPP: 登出。
+  - listener: Hub
+  - event name: teacher_logout
+  - channel: org_id
+  - data:
+    ```
+      {
+        "user_id": str,
+      }
+    ```
 
-    - #### Listeners:
+- ## Flow
 
-      1. TeacherHub：TeacherHub 會接收到 TeacherAPP 登出的通知。
-
-    - #### Response(Listeners):
-
-      1. TeacherHub:
-
-         - event_name = 'teacher_logout'
-           ```
-             {"user_id": {user_id}}
-           ```
-         - broadcast_channel:
-
-           ```
-              org_id
-           ```
-
-    - #### FLOW
+  - ### 1. Teacher APP
 
     ```mermaid
     sequenceDiagram
-
-        participant A as TeacherAPP
-        participant B as Backend
+        autonumber
+        participant A as Teacher APP
+        participant B as Socket Server
         participant R as Redis
-        participant H as TeacherHub
+        participant H as Hub
 
 
-        A->>B: 1. teacher_logout
-        B->>R: 2. remove "alive:org_{org_id}_user_{user_id}" key
-        R->>B: success
-        B->>H: 3. emit all TeacherHub in same org  {"user_id":{user_id}}
+        A->>B: emit teacher_logout(user_id,org_id)
+        R->>B: delete ["alive:org_{org_id}_user_{user_id}"]
+        rect rgba(160, 160, 160, 0.5)
+        B->>H: emit teacher_logout {"user_id":{user_id}}
+        end
 
     ```

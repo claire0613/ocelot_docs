@@ -1,144 +1,122 @@
-- # 事件名稱: join_lesson
+# on_join_lesson
 
-- ### Request(client emit data):
+- #### Infra
+
+  - [x] Redis
+  - [x] RDS
+
+- #### Client
+
+  - [x] Teacher App
+  - [x] Participant
+  - [ ] Hub
+
+- #### Server Event Handler
+
+  - data
+
+    ```
+    None
+    ```
+
+  - callback
+
+    - SUCCESS
+
+      ```
+        {
+            "status": "SUCCESS",
+            "data": {}
+        }
+      ```
+
+      - ERROR
+
+        ```
+        {
+          "status": "ERROR",
+          "message": str(e)
+        }
+        ```
+
+- #### Client Event Handler
 
   ```
-  {
-    user_id:str,
-    lesson_id:str,
-    access_token:str,
-    role:str,
-  }
+    None
   ```
 
-- ## Relative Infrastructure
+- ## Flow
 
-  1. Redis
-  2. DB
+  - ### 1. Teacher APP
 
-- ### CallBackResponse:
-
-  ```
-  {"status": SUCCESS|ERROR, "data": {}}
-  ```
-
-- ## Usecase
-
-  - ### 1. TeacherAPP Join Lesson
-
-    - #### Clients:
-
-      1. TeacherAPP: TeacherAPP join lesson 訂閱 lesson_id channel
-
-    - #### Listeners:
-
-          None
-
-    - #### Response(Listeners):
-
-          None
-
-      - #### FLOW
-
-        ```mermaid
+    ```mermaid
         sequenceDiagram
-
-            participant A as TeacherAPP
-            participant B as Backend
+            autonumber
+            participant A as Teacher APP
+            participant B as Socket Server
             participant R as Redis
-            participant D as DB
+            participant D as RDS
 
-            A->>B: 1. join_lesson
-            B->>D: 2. check_lesson_exists
+            A->>B: emit join_lesson
+            B->>D: check_lesson_exists
             alt if not lesson exists
               D->>B: not found lesson_id
               B->>A: return error
-            else lesson exists
-               D->>B: success
-
             end
-            B->>B: 3. enter_room
-            B->>D: 4. query student_attend seat by lesson_id nad student_id
+            B->>B: enter_room
             D->>B : get seat
             B->>B : get session
             alt if seat
-                B->>B: update session {seat:'seat}
+                B->>B: add {'seat':seat} in session
             end
             B->>B: save session
-            B->>R: 5. query "lesson_seat_{lesson_id}"key
-            R->>B : get lesson_seat_in_redis
+            R->>B: get lesson_seat_in_redis from [lesson_seat_{lesson_id}]
             alt if not lesson_seat_* exists
-                B->>R: add "lesson_seat_*" key  {1:"",2:""....}
-                R->>B: return
+                R->>B: set  {1:"",2:""....} to [lesson_seat_{lesson_id}]
             end
-            B->>R: add lesson_teacher_{lesson_id}"key {{user_id}:sid} & TTL 24hrs
-            R->>B: return
-            B->>R: set user_id key {"lesson_id": lesson_id}
-            R->>B: return
+            R->>B: set {{user_id}:sid} to [lesson_teacher_{lesson_id}] & TTL 24hrs
+            R->>B: set {"lesson_id": lesson_id} to [{user_id}]
             B->>A: return success
 
-        ```
+    ```
 
-  - ### 2. ParticipantWeb Join Lesson
+  - ### 2. Participant
 
-    - #### Clients:
+    ```mermaid
+    sequenceDiagram
 
-      1.  ParticipantWeb : ParticipantWeb join lesson 訂閱 lesson_id channel
+        participant A as Participant
+        participant B as Socket Server
+        participant R as Redis
+        participant D as RDS
 
-    - #### Listeners:
-
-          None
-
-    - #### Response(Listeners):
-
-          None
-
-    - #### FLOW
-
-      ```mermaid
-      sequenceDiagram
-
-          participant A as TeacherAPP
-          participant B as Backend
-          participant R as Redis
-          participant D as DB
-
-          A->>B: 1. join_lesson
-          B->>D: 2. check_lesson_exists
-          alt if not lesson exists
-            D->>B: not found lesson_id
-            B->>A: return error
-          else lesson exists
-             D->>B: success
-
-          end
-          B->>B: 3. enter_room
-          B->>D: 4. query student_attend seat by lesson_id nad student_id
-          D->>B : get seat
-          B->>B : get session
-          alt if seat
-              B->>B: update session {seat:'seat}
-          end
-          B->>B: save session
-          B->>R: 5. query "lesson_seat_{lesson_id}"key
-          R->>B : get lesson_seat_in_redis
-          alt if not lesson_seat_* exists
-              B->>R: add "lesson_seat_*" key  {1:"",2:""....}
-              R->>B: return
-          end
-          alt if access_token is not None
-              B->>B: get client_id by access_token
-              B->>B: save session {"client_id":str,"role":str}
-              B->>R: save session get {client_id} key exists
+        A->>B: emit join_lesson
+        B->>D: check_lesson_exists
+        alt if not lesson exists
+          D->>B: not found lesson_id
+          B->>A: return error
+        end
+        B->>B: enter_room
+        D->>B : get seat
+        B->>B : get session
+        alt if seat
+            B->>B: add {'seat':seat} in session
+        end
+        B->>B: save session
+        R->>B: get lesson_seat_in_redis from [lesson_seat_{lesson_id}]
+        alt if not lesson_seat_* exists
+            R->>B: set  {1:"",2:""....} to [lesson_seat_{lesson_id}]
+        end
+        alt if access_token is not None
+            B->>B: get client_id by access_token
+            B->>B: save session {"client_id":str,"role":str}
+            R->>B:  get {client_id} key exists
             alt if {client_id} key exists
                 B->>B: call mixpanel reconnect
             end
-            B->>R: reset sid in  client_id key {"sid":str,"client_id":str,"role":str} & TTL 24 hr
-            R->>B: return
-            B->>R: reset sid in lesson_student_{lesson_id}  {"client_id":sid}
-            R->>B: return
-          end
+          R->>B: set {"sid":str,"client_id":str,"role":str} to [{client_id}] & TTL 24 hr
+          R->>B: set {"{client_id}":sid} to [lesson_student_{lesson_id}]
+        end
+        B->>A: return success
 
-          B->>A: return success
-
-      ```
+    ```

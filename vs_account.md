@@ -32,9 +32,7 @@ graph LR
 
 ### 3. Check Individual Plan
 
-- 個人組織未曾有過 plan,會根據國家給予 30 天的
-  - if 國家 == TW -> `Plus` Plan
-  - if 國家 == Global `Basic` Plan
+- 個人組織未曾有過 plan,會根據國家給予 30 天的 Plus or Basic Plan
 - 如果個人組織已經有存在 plan 則會確定所有方案是否過期,過期則會補一個 Permanent `Basic` Plan
 
 ```mermaid

@@ -120,12 +120,6 @@
           participant R as Redis
           A->>B: connect
           B->>R: enter_room(room_id=org_id)
-          alt reconnected
-              alt get_lesson_id
-                  B->>B:call mixpanel reconnect
-              end
-
-          end
 
       ```
 
