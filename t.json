@@ -1,0 +1,26 @@
+{
+  "data": [
+    {
+      "user_display_name": "",
+      "org_id": "",
+      "is_individual": false,
+      "package": "",
+      "org_name": "",
+      "roles": ["owner", "teacher"],
+      "package_code": 1,
+      "end_date": 1,
+      "student_concurrent": 1
+    },
+    {
+      "user_display_name": "str",
+      "org_id": "str",
+      "is_individual": true,
+      "package": "str",
+      "org_name": "Individual",
+      "roles": ["teacher"],
+      "package_code": 1,
+      "end_date": 1,
+      "student_concurrent": 1
+    }
+  ]
+}

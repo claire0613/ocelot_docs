@@ -110,10 +110,8 @@ graph LR
 
 graph LR
 
-    Invoke_get_enity_info[Invoke VS API  GET /entity/<entity_id>] --> Entity_info["Get owner_email in entity_info "]
-    Entity_info --> Get_user[Get user by owner_email ]
-    Get_user --> Check_user{User?} --> |No|Done
-    Check_user --> |Yes|Check_role{Owner role in org?} --> Done
+    Check_user{role including owner?} --> |Yes|Check_role{Owner role in org?} --> Done
+    Check_user--> Done
     Check_role--> |No|role_n["Create a owner role "] --> Done
 
 ```
